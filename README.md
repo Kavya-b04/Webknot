@@ -1,349 +1,218 @@
-# Campus Event Management Platform - Backend
+🎓 Campus Event Management Platform
 
-A comprehensive MERN stack backend for managing campus events, built with Node.js, Express, and MySQL.
+This is my full-stack project built using the MERN stack with MySQL as the database. The idea is to have a platform where colleges can manage their campus events, and both admins and students get their own features.
 
-## Features
+What the Project Does
+👩‍💼 Admin Side
 
-### Admin Portal
-- Create, update, and delete events
-- Mark attendance for students
-- View comprehensive reports and analytics
-- Manage event registrations
+Create, edit, and delete events for their college.
 
-### Student App
-- Browse events from their college
-- Register for events
-- Submit feedback and ratings (1-5 stars)
-- View attendance history
+Manage event registrations and mark student attendance.
 
-## Tech Stack
+View reports on event popularity, student activity, and feedback.
 
-- **Runtime**: Node.js
-- **Framework**: Express.js
-- **Database**: MySQL
-- **Authentication**: JWT (JSON Web Tokens)
-- **Password Hashing**: bcryptjs
-- **Validation**: express-validator
+🎓 Student Side
 
-## Database Schema
+Browse upcoming events from their college.
 
-### Tables
-- `colleges`: College information (id, name, location)
-- `admins`: Admin users (id, name, email, password, college_id)
-- `students`: Student users (id, name, email, password, college_id)
-- `events`: Event details (id, title, description, type, date, created_by, college_id)
-- `registrations`: Event registrations (id, event_id, student_id)
-- `attendance`: Attendance records (id, event_id, student_id, status)
-- `feedback`: Student feedback (id, event_id, student_id, rating, comments)
+Register for events with one click.
 
-## Installation & Setup
+Give ratings (1–5 stars) and feedback after attending.
 
-### Prerequisites
-- Node.js (v14 or higher)
-- MySQL (v8.0 or higher)
-- npm or yarn
+Check attendance history and participation.
 
-### 1. Clone and Install Dependencies
-```bash
-cd backend
-npm install
-```
+⚙️ Tech Stack
 
-### 2. Environment Configuration
-```bash
-cp .env.example .env
-```
+Frontend: React.js + TailwindCSS (clean and responsive UI)
 
-Update the `.env` file with your database credentials:
-```env
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=your_mysql_password
-DB_NAME=campus_events
-JWT_SECRET=your_super_secret_jwt_key_here
-PORT=5000
-NODE_ENV=development
-```
+Backend: Node.js + Express.js
 
-### 3. Database Setup
-Create the MySQL database and tables:
+Database: MySQL (with relational schema for colleges, admins, students, events, etc.)
 
-```sql
-CREATE DATABASE campus_events;
+Authentication: JWT (tokens stored on client side)
 
-USE campus_events;
+Security: bcryptjs for password hashing, express-validator for inputs
 
--- Colleges table
-CREATE TABLE colleges (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(255) NOT NULL,
-    location VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+🗂️ Database Design
 
--- Admins table
-CREATE TABLE admins (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    college_id INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (college_id) REFERENCES colleges(id) ON DELETE CASCADE
-);
+I used MySQL because it is reliable for relational data.
 
--- Students table
-CREATE TABLE students (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    college_id INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (college_id) REFERENCES colleges(id) ON DELETE CASCADE
-);
+Main tables include:
 
--- Events table
-CREATE TABLE events (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    title VARCHAR(255) NOT NULL,
-    description TEXT,
-    type ENUM('workshop', 'fest', 'seminar', 'conference', 'competition', 'other') NOT NULL,
-    date DATETIME NOT NULL,
-    created_by INT NOT NULL,
-    college_id INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (created_by) REFERENCES admins(id) ON DELETE CASCADE,
-    FOREIGN KEY (college_id) REFERENCES colleges(id) ON DELETE CASCADE
-);
+colleges → basic info about colleges
 
--- Registrations table
-CREATE TABLE registrations (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    event_id INT NOT NULL,
-    student_id INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
-    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
-    UNIQUE KEY unique_registration (event_id, student_id)
-);
+admins → college admins who create/manage events
 
--- Attendance table
-CREATE TABLE attendance (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    event_id INT NOT NULL,
-    student_id INT NOT NULL,
-    status ENUM('present', 'absent') NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
-    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
-    UNIQUE KEY unique_attendance (event_id, student_id)
-);
+students → registered students
 
--- Feedback table
-CREATE TABLE feedback (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    event_id INT NOT NULL,
-    student_id INT NOT NULL,
-    rating INT NOT NULL CHECK (rating >= 1 AND rating <= 5),
-    comments TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
-    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
-    UNIQUE KEY unique_feedback (event_id, student_id)
-);
+events → event details (linked to colleges + admins)
 
--- Insert sample data
-INSERT INTO colleges (name, location) VALUES 
-('MIT', 'Cambridge, MA'),
-('Stanford University', 'Stanford, CA'),
-('Harvard University', 'Cambridge, MA');
+registrations → who registered for which event
 
-INSERT INTO admins (name, email, password, college_id) VALUES 
-('Admin User', 'admin@mit.edu', '$2a$10$example_hash', 1);
+attendance → marking attendance as present/absent
 
-INSERT INTO students (name, email, password, college_id) VALUES 
-('John Doe', 'john@mit.edu', '$2a$10$example_hash', 1),
-('Jane Smith', 'jane@mit.edu', '$2a$10$example_hash', 1);
-```
+feedback → ratings + comments by students
 
-### 4. Run the Application
-```bash
-# Development mode (with auto-restart)
-npm run dev
+All the relationships are maintained using foreign keys.
 
-# Production mode
-npm start
-```
+project screenshots
+admin dashboard
+<img width="1920" height="1080" alt="admin dashboard" src="https://github.com/user-attachments/assets/49cb0e57-9b17-478b-8df6-c6603f836617" />
 
-The server will start on `http://localhost:5000`
+attendance management
+<img width="1920" height="1080" alt="Screenshot (84)" src="https://github.com/user-attachments/assets/3dac6796-6150-42b6-b542-e367d37aa852" />
 
-## API Endpoints
+<img width="1920" height="1080" alt="Screenshot (85)" src="https://github.com/user-attachments/assets/94944dd5-11ef-4600-aef2-f35c9ddb9e20" />
+<img width="1920" height="1080" alt="Screenshot (86)" src="https://github.com/user-attachments/assets/ae546412-4452-4ca1-ba5f-7fddfb22b117" />
 
-### Authentication
-- `POST /api/auth/admin/signup` - Admin registration
-- `POST /api/auth/admin/login` - Admin login
-- `POST /api/auth/student/signup` - Student registration
-- `POST /api/auth/student/login` - Student login
+<img width="1920" height="1080" alt="Screenshot (87)" src="https://github.com/user-attachments/assets/feb88b4d-7274-470c-af95-755f67111d96" />
+<img width="1920" height="1080" alt="Screenshot (88)" src="https://github.com/user-attachments/assets/bd6856af-3731-4a37-af56-0a0c0fe526dc" />
+<img width="1920" height="1080" alt="Screenshot (89)" src="https://github.com/user-attachments/assets/182d1fe8-650b-4350-9cb1-18da24bf3bf7" />
+<img width="1920" height="1080" alt="Screenshot (81)" src="https://github.com/user-attachments/assets/7dfd42b9-19d7-4828-b47b-02a29784bb60" />
+<img width="1920" height="1080" alt="Screenshot (83)" src="https://github.com/user-attachments/assets/dac8dc69-fef2-455a-90e2-ca187a7d856f" />
 
-### Events
-- `POST /api/events` - Create event (Admin only)
-- `GET /api/events/:collegeId` - Get events by college (Students)
-- `GET /api/events` - Get all events (Admin only)
-- `GET /api/events/single/:id` - Get single event
-- `PUT /api/events/:id` - Update event (Admin only)
-- `DELETE /api/events/:id` - Delete event (Admin only)
-- `GET /api/events/stats/:id` - Get event statistics
+i used chat gpt for how to prompt in curosr ...it gave prompt to paste in curosr
+chatgpt prompt
+You are an expert MERN stack backend developer.  
+Build the backend for a **Campus Event Management Platform** using **Node.js, Express, and MySQL**.
 
-### Registrations
-- `POST /api/registrations/:eventId` - Register for event (Student)
-- `GET /api/registrations/student` - Get student registrations
-- `GET /api/registrations/event/:eventId` - Get event registrations (Admin)
-- `DELETE /api/registrations/:eventId` - Cancel registration (Student)
+### Requirements:
+- Admin portal:
+  - Admin can create, update, delete events.
+  - Admin can mark attendance for students in an event.
+- Student app:
+  - Students can browse events (only their college).
+  - Students can register for events.
+  - Students can submit feedback (rating 1–5).
 
-### Attendance
-- `POST /api/attendance/:eventId/:studentId` - Mark attendance (Admin)
-- `GET /api/attendance/event/:eventId` - Get event attendance (Admin)
-- `GET /api/attendance/student` - Get student attendance
-- `GET /api/attendance/stats/:eventId` - Get attendance statistics
+### Database schema (MySQL):
+- `colleges`: id, name, location
+- `admins`: id, name, email, password (hashed), college_id
+- `students`: id, name, email, password (hashed), college_id
+- `events`: id, title, description, type (workshop/fest/seminar/etc), date, created_by (admin_id), college_id
+- `registrations`: id, event_id, student_id
+- `attendance`: id, event_id, student_id, status (present/absent)
+- `feedback`: id, event_id, student_id, rating (1–5), comments
 
-### Feedback
-- `POST /api/feedback/:eventId` - Submit feedback (Student)
-- `GET /api/feedback/student` - Get student feedback
-- `GET /api/feedback/event/:eventId` - Get event feedback (Admin)
-- `GET /api/feedback/stats/:eventId` - Get feedback statistics
+### API Endpoints:
+#### Auth
+- `POST /api/auth/admin/signup`
+- `POST /api/auth/admin/login`
+- `POST /api/auth/student/signup`
+- `POST /api/auth/student/login`
 
-### Reports
-- `GET /api/reports/popularity` - Event popularity report (Admin)
-- `GET /api/reports/attendance/:eventId` - Event attendance report (Admin)
-- `GET /api/reports/feedback/:eventId` - Event feedback report (Admin)
-- `GET /api/reports/student/:studentId` - Student activity report (Admin)
-- `GET /api/reports/top-students` - Top active students (Admin)
-- `GET /api/reports/dashboard` - Dashboard overview (Admin)
+#### Events
+- `POST /api/events` (admin only, create event)
+- `GET /api/events/:collegeId` (students fetch events for their college)
+- `PUT /api/events/:id` (admin update event)
+- `DELETE /api/events/:id` (admin delete event)
 
-## Authentication
+#### Registration
+- `POST /api/registrations/:eventId` (student register)
 
-All protected routes require a JWT token in the Authorization header:
-```
-Authorization: Bearer <your_jwt_token>
-```
+#### Attendance
+- `POST /api/attendance/:eventId/:studentId` (admin mark attendance)
 
-## Sample API Usage
+#### Feedback
+- `POST /api/feedback/:eventId` (student submit rating + comments)
 
-### 1. Admin Signup
-```bash
-curl -X POST http://localhost:5000/api/auth/admin/signup \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Admin User",
-    "email": "admin@college.edu",
-    "password": "password123",
-    "college_id": 1
-  }'
-```
+#### Reports
+- `GET /api/reports/popularity` → total registrations per event
+- `GET /api/reports/attendance/:eventId` → attendance % for that event
+- `GET /api/reports/feedback/:eventId` → average feedback score
+- `GET /api/reports/student/:studentId` → how many events a student attended
+- `GET /api/reports/top-students` → top 3 most active students
 
-### 2. Student Login
-```bash
-curl -X POST http://localhost:5000/api/auth/student/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "student@college.edu",
-    "password": "password123"
-  }'
-```
+### Extra:
+- Use **JWT authentication** for admins & students.
+- Store secrets in `.env` file (e.g., DB connection, JWT secret).
+- Organize code with MVC pattern:
+  - `models/`
+  - `controllers/`
+  - `routes/`
+  - `config/db.js`
 
-### 3. Create Event (Admin)
-```bash
-curl -X POST http://localhost:5000/api/events \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <admin_token>" \
-  -d '{
-    "title": "Tech Workshop",
-    "description": "Learn about modern web development",
-    "type": "workshop",
-    "date": "2024-01-15T10:00:00Z",
-    "college_id": 1
-  }'
-```
+### Deliverables:
+- Full backend project structure
+- Connection to MySQL
+- Sample `.env.example` file
+- Instructions in `README.md` for setup and running
 
-### 4. Register for Event (Student)
-```bash
-curl -X POST http://localhost:5000/api/registrations/1 \
-  -H "Authorization: Bearer <student_token>"
-```
+You are an expert React + TailwindCSS frontend developer.  
+Build the frontend for a **Campus Event Management Platform**.  
 
-## Project Structure
+### Requirements:
+There are two roles: **Admin Portal (Web)** and **Student App (Web/Mobile-friendly)**.
 
-```
-backend/
-├── config/
-│   └── db.js              # Database configuration
-├── controllers/
-│   ├── authController.js   # Authentication logic
-│   ├── eventController.js  # Event management
-│   ├── registrationController.js
-│   ├── attendanceController.js
-│   ├── feedbackController.js
-│   └── reportController.js
-├── middleware/
-│   └── auth.js            # JWT authentication middleware
-├── models/
-│   ├── College.js         # College model
-│   ├── Admin.js           # Admin model
-│   ├── Student.js         # Student model
-│   ├── Event.js           # Event model
-│   ├── Registration.js    # Registration model
-│   ├── Attendance.js      # Attendance model
-│   └── Feedback.js        # Feedback model
-├── routes/
-│   ├── auth.js            # Authentication routes
-│   ├── events.js          # Event routes
-│   ├── registrations.js   # Registration routes
-│   ├── attendance.js      # Attendance routes
-│   ├── feedback.js        # Feedback routes
-│   └── reports.js         # Report routes
-├── .env.example           # Environment variables template
-├── package.json           # Dependencies and scripts
-├── server.js              # Main server file
-└── README.md              # This file
-```
+---
 
-## Error Handling
+### Tech Stack:
+- React (Vite)
+- TailwindCSS (already installed with PostCSS + Autoprefixer)
+- React Router DOM for navigation
+- Axios for API calls to backend (Express + MySQL)
+- Component structure should be clean and reusable
 
-The API returns consistent error responses:
-```json
-{
-  "message": "Error description",
-  "errors": [] // Validation errors (if any)
-}
-```
+---
 
-## Development
+### Pages & Features:
 
-### Running in Development Mode
-```bash
-npm run dev
-```
+#### 🔑 Authentication
+- **Login / Signup for Students**
+- **Login / Signup for Admins**
+- Save JWT token in `localStorage` and use it for protected routes
 
-This uses nodemon for automatic server restarts on file changes.
+---
 
-### Environment Variables
-- `DB_HOST`: MySQL host (default: localhost)
-- `DB_USER`: MySQL username (default: root)
-- `DB_PASSWORD`: MySQL password
-- `DB_NAME`: Database name (default: campus_events)
-- `JWT_SECRET`: Secret key for JWT tokens
-- `PORT`: Server port (default: 5000)
-- `NODE_ENV`: Environment (development/production)
+#### 🎓 Student App (Web/Mobile UI)
+- **Browse Events Page** → List events from their college  
+  (API: `GET /api/events/:collegeId`)
+- **Register for Event Button** → Calls  
+  (API: `POST /api/registrations/:eventId`)
+- **My Events Page** → Shows events student registered for
+- **Submit Feedback Page** → Rate event 1–5 + optional comments  
+  (API: `POST /api/feedback/:eventId`)
 
-## Contributing
+---
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+#### 🛠️ Admin Portal (Web UI)
+- **Dashboard** → Show list of all events created by the admin
+- **Create Event Form** → title, description, type, date  
+  (API: `POST /api/events`)
+- **Edit/Delete Event** → update or remove event  
+  (API: `PUT /api/events/:id`, `DELETE /api/events/:id`)
+- **Attendance Page** → Mark attendance for students in event  
+  (API: `POST /api/attendance/:eventId/:studentId`)
+- **Reports Page**:
+  - Event Popularity Report → Sorted by registrations  
+    (API: `GET /api/reports/popularity`)
+  - Attendance % for each event  
+    (API: `GET /api/reports/attendance/:eventId`)
+  - Average feedback score per event  
+    (API: `GET /api/reports/feedback/:eventId`)
+  - Student participation report  
+    (API: `GET /api/reports/student/:studentId`)
+  - Top 3 most active students  
+    (API: `GET /api/reports/top-students`)
 
-## License
+---
 
-This project is licensed under the ISC License.
+### UI/UX Notes:
+- Use TailwindCSS for styling
+- Responsive design → student UI should be mobile-friendly
+- Admin portal can be desktop-first
+- Use simple cards, tables, and modals
+
+---
+
+### Deliverables:
+- React project with `src/components`, `src/pages`
+- Routing for Admin vs Student (separate dashboards)
+- Axios setup for backend API calls
+- Tailwind styling applied
+- Sample `.env.example` file for frontend (API base URL)
+- Instructions in `README.md` on how to run the frontend
+
+i used cursor for both backend and frontend code
+
+
