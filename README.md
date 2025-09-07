@@ -71,6 +71,8 @@ attendance management
 <img width="1920" height="1080" alt="Screenshot (81)" src="https://github.com/user-attachments/assets/7dfd42b9-19d7-4828-b47b-02a29784bb60" />
 <img width="1920" height="1080" alt="Screenshot (83)" src="https://github.com/user-attachments/assets/dac8dc69-fef2-455a-90e2-ca187a7d856f" />
 
+
+WITH AI CONVERSATION **************PROMPT TO CURSOR
 i used chat gpt for how to prompt in curosr ...it gave prompt to paste in curosr
 chatgpt prompt
 You are an expert MERN stack backend developer.  
